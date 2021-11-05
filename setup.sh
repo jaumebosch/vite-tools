@@ -54,7 +54,7 @@ rm  "gvite-$LATEST-linux.tar.gz"
 printf "\n${info}Vite FullNode name? ${normal}\n"
 read fullNodeName
 
-declare config_file="../${work_dir}/node_config.json"
+declare config_file="${work_dir}/node_config.json"
 
 isInFile=$(cat ${config_file} | grep -c "foobar")
 if [ $isInFile -eq 0 ]; then
