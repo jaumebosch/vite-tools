@@ -40,7 +40,7 @@ else
 fi
 
 
-declare work_dir="gvite"
+declare work_dir="~/gvite"
 LATEST=$(curl --silent "https://api.github.com/repos/vitelabs/go-vite/releases/latest" |
     grep '"tag_name":' |
     sed -E 's/.*"([^"]+)".*/\1/')
