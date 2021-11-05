@@ -11,11 +11,13 @@ error=$(tput setaf 1)
 success=$(tput setaf 2)
 normal=$(tput sgr0)
 
+declare work_dir="../gvite"
+
 LATEST=$(curl --silent "https://api.github.com/repos/vitelabs/go-vite/releases/latest" |
     grep '"tag_name":' |
     sed -E 's/.*"([^"]+)".*/\1/')
 
-CURRENT=$(./vite/gvite -v | sed -n -e 's/^.*version //p')
+CURRENT=$(~/gvite/gvite -v | sed -n -e 's/^.*version //p')
 
 if [ "$CURRENT" == "$LATEST" ]; then
     printf "${success}You are running the latest stable Vite Node release ($CURRENT)${normal}\n"
