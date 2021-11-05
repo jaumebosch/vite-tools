@@ -39,7 +39,7 @@ else
 fi
 
 
-declare work_dir="gvite"
+declare work_dir="../gvite"
 LATEST=$(curl --silent "https://api.github.com/repos/vitelabs/go-vite/releases/latest" |
     grep '"tag_name":' |
     sed -E 's/.*"([^"]+)".*/\1/')
@@ -47,7 +47,7 @@ LATEST=$(curl --silent "https://api.github.com/repos/vitelabs/go-vite/releases/l
 printf "\n${info}Downloading latest Vite Node stable release ($LATEST) ${normal}\n"
 curl -L -O "https://github.com/vitelabs/go-vite/releases/download/$LATEST/gvite-$LATEST-linux.tar.gz"
 tar -xzvf "gvite-$LATEST-linux.tar.gz"
-mv gvite-$LATEST-linux ../${work_dir}
+mv gvite-$LATEST-linux ${work_dir}
 rm  "gvite-$LATEST-linux.tar.gz"
 
 
@@ -76,21 +76,21 @@ else
     printf "> Vite Account set to ${info}$viteAccount${normal}\n\n"
 fi
 
-
+declare vite-tools_dir="./vite-tools"
 declare bashrc_file="../.bashrc"
 
-isInFile=$(cat ${bashrc_file} | grep -c "release_checker.sh")
+isInFile=$(cat ${bashrc_file} | grep -c "check_release.sh")
 if [ $isInFile -eq 0 ]; then
     printf "> ${success}modifying bashrc to launch release_checker.sh on login...${normal}\n\n"
-    echo "${work_dir}/release_checker.sh" >> ${bashrc_file}
+    echo "${vite-tools_dir}/check_release.sh" >> ${bashrc_file}
 else
     printf "> ${error}bashrc already has release_checker.sh command${normal}\n\n"
 fi
 
-isInFile=$(cat ${bashrc_file} | grep -c "process_checker.sh")
+isInFile=$(cat ${bashrc_file} | grep -c "check_process.sh")
 if [ $isInFile -eq 0 ]; then
     printf "> ${success}modifying bashrc to launch process_checker.sh on login...${normal}\n\n"
-    echo "${work_dir}/process_checker.sh" >> ${bashrc_file}
+    echo "${vite-tools_dir}/check_process.sh" >> ${bashrc_file}
 else
     printf "> ${error}bashrc already has process_checker.sh command${normal}\n\n"
 fi
