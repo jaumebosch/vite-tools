@@ -40,7 +40,7 @@ else
 fi
 
 
-declare work_dir=$(~/gvite)
+declare work_dir="../gvite"
 LATEST=$(curl --silent "https://api.github.com/repos/vitelabs/go-vite/releases/latest" |
     grep '"tag_name":' |
     sed -E 's/.*"([^"]+)".*/\1/')
@@ -79,7 +79,7 @@ else
 fi
 
 
-declare bashrc_file=$(~/.bashrc)
+declare bashrc_file="../.bashrc"
 isInFile=$(cat ${bashrc_file} | grep -c "release_checker.sh")
 
 if [ $isInFile -eq 0 ]; then
