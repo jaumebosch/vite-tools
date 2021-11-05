@@ -76,13 +76,13 @@ else
     printf "> Vite Account set to ${info}$viteAccount${normal}\n\n"
 fi
 
-declare vite-tools_dir="./vite-tools"
+declare vite_tools_dir="./vite-tools"
 declare bashrc_file="../.bashrc"
 
 isInFile=$(cat ${bashrc_file} | grep -c "check_release.sh")
 if [ $isInFile -eq 0 ]; then
     printf "> ${success}modifying bashrc to launch release_checker.sh on login...${normal}\n\n"
-    echo "${vite-tools_dir}/check_release.sh" >> ${bashrc_file}
+    echo "${vite_tools_dir}/check_release.sh" >> ${bashrc_file}
 else
     printf "> ${error}bashrc already has release_checker.sh command${normal}\n\n"
 fi
@@ -90,7 +90,7 @@ fi
 isInFile=$(cat ${bashrc_file} | grep -c "check_process.sh")
 if [ $isInFile -eq 0 ]; then
     printf "> ${success}modifying bashrc to launch process_checker.sh on login...${normal}\n\n"
-    echo "${vite-tools_dir}/check_process.sh" >> ${bashrc_file}
+    echo "${vite_tools_dir}/check_process.sh" >> ${bashrc_file}
 else
     printf "> ${error}bashrc already has process_checker.sh command${normal}\n\n"
 fi
