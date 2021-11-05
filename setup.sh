@@ -40,7 +40,7 @@ else
 fi
 
 
-declare work_dir="~/gvite"
+declare work_dir="../gvite"
 LATEST=$(curl --silent "https://api.github.com/repos/vitelabs/go-vite/releases/latest" |
     grep '"tag_name":' |
     sed -E 's/.*"([^"]+)".*/\1/')
@@ -48,7 +48,7 @@ LATEST=$(curl --silent "https://api.github.com/repos/vitelabs/go-vite/releases/l
 printf "\n${info}Downloading latest Vite Node stable release ($LATEST) ${normal}\n"
 curl -L -O "https://github.com/vitelabs/go-vite/releases/download/$LATEST/gvite-$LATEST-linux.tar.gz"
 tar -xzvf "gvite-$LATEST-linux.tar.gz"
-mv "gvite-$LATEST-linux" ${work_dir}
+mv gvite-$LATEST-linux ${work_dir}
 
 
 
