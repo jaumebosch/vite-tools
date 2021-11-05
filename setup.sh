@@ -17,7 +17,6 @@ normal=$(tput sgr0)
 declare limits_file="/etc/security/limits.conf"
 isInFile=$(cat ${limits_file} | grep -c "root soft nofile 10240
 root hard nofile 10240")
-
 if [ $isInFile -eq 0 ]; then
     printf "> ${success}modifing limits.conf...${normal}\n"
     sed -i '/^# End of file/i \
@@ -30,8 +29,8 @@ fi
 
 
 declare pam_limits_file="/etc/pam.d/common-session"
-isInFile=$(cat ${pam_limits_file} | grep -c "session required pam_limits.so")
 
+isInFile=$(cat ${pam_limits_file} | grep -c "session required pam_limits.so")
 if [ $isInFile -eq 0 ]; then
     printf "> ${success}modifing pam_limits.so...{$normal}\n\n"
     echo "session required pam_limits.so" >> ${pam_limits_file}
@@ -40,7 +39,7 @@ else
 fi
 
 
-declare work_dir="../gvite"
+declare work_dir="gvite"
 LATEST=$(curl --silent "https://api.github.com/repos/vitelabs/go-vite/releases/latest" |
     grep '"tag_name":' |
     sed -E 's/.*"([^"]+)".*/\1/')
@@ -48,16 +47,16 @@ LATEST=$(curl --silent "https://api.github.com/repos/vitelabs/go-vite/releases/l
 printf "\n${info}Downloading latest Vite Node stable release ($LATEST) ${normal}\n"
 curl -L -O "https://github.com/vitelabs/go-vite/releases/download/$LATEST/gvite-$LATEST-linux.tar.gz"
 tar -xzvf "gvite-$LATEST-linux.tar.gz"
-mv gvite-$LATEST-linux ${work_dir}
-
+mv gvite-$LATEST-linux ../${work_dir}
+rm  "gvite-$LATEST-linux.tar.gz"
 
 
 printf "\n${info}Vite FullNode name? ${normal}\n"
 read fullNodeName
 
-declare config_file="${work_dir}/node_config.json"
-isInFile=$(cat ${config_file} | grep -c "foobar")
+declare config_file="../${work_dir}/node_config.json"
 
+isInFile=$(cat ${config_file} | grep -c "foobar")
 if [ $isInFile -eq 0 ]; then
     printf "> ${error}Unable to set Vite Node name, already modified?${normal}\n\n"
 else
@@ -70,7 +69,6 @@ printf "${info}Vite account? ${normal}\n"
 read viteAccount
 
 isInFile=$(cat ${config_file} | grep -c "vite_xxxxxxxxxxxxxxxxxx")
-
 if [ $isInFile -eq 0 ]; then
     printf "> ${error}Unable to ser Vite Account, already modified?${normal}\n\n"
 else
@@ -80,20 +78,19 @@ fi
 
 
 declare bashrc_file="../.bashrc"
-isInFile=$(cat ${bashrc_file} | grep -c "release_checker.sh")
 
+isInFile=$(cat ${bashrc_file} | grep -c "release_checker.sh")
 if [ $isInFile -eq 0 ]; then
-    printf "> ${success}modifying bashrc to launch release_checker.sh on login...{$normal}\n\n"
-    echo "./release_checker.sh" >> ${bashrc_file}
+    printf "> ${success}modifying bashrc to launch release_checker.sh on login...${normal}\n\n"
+    echo "${work_dir}/release_checker.sh" >> ${bashrc_file}
 else
     printf "> ${error}bashrc already has release_checker.sh command${normal}\n\n"
 fi
 
 isInFile=$(cat ${bashrc_file} | grep -c "process_checker.sh")
-
 if [ $isInFile -eq 0 ]; then
-    printf "> ${success}modifying bashrc to launch process_checker.sh on login...{$normal}\n\n"
-    echo "./release_checker.sh" >> ${bashrc_file}
+    printf "> ${success}modifying bashrc to launch process_checker.sh on login...${normal}\n\n"
+    echo "${work_dir}/process_checker.sh" >> ${bashrc_file}
 else
     printf "> ${error}bashrc already has process_checker.sh command${normal}\n\n"
 fi
