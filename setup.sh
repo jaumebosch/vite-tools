@@ -32,7 +32,7 @@ declare pam_limits_file="/etc/pam.d/common-session"
 
 isInFile=$(cat ${pam_limits_file} | grep -c "session required pam_limits.so")
 if [ $isInFile -eq 0 ]; then
-    printf "> ${success}modifing pam_limits.so...{$normal}\n\n"
+    printf "> ${success}modifing pam_limits.so...${normal}\n\n"
     echo "session required pam_limits.so" >> ${pam_limits_file}
 else
     printf "> ${error}pam_limits.conf already modified${normal}\n\n"
