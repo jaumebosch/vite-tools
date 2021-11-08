@@ -12,7 +12,10 @@ Simple bash scripts for setup a [Vite](https://www.vite.org/) Node Server
 [Vite](https://vite.org) has built a Directed Acyclic Graph (DAG) based smart-contract platform, with a Snapshot Chain structure to facilitate zero-fee transactions and optimize transaction speed, reliability, and security. The Snapshot Chain of Vite utilizes Hierarchical Delegated Proof of Stake (“HDPoS”) to achieve network consensus, while supernodes take only staking rewards and no transaction fees. Vite virtual machine maintains compatibility with EVM, and utilizes asynchronous smart contract language, Solidity++.
 
 ## Installation
-Go to your root directory and execute git clone `https://github.com/jaumebosch/vite-tools.git`. Then execute ./setup.sh
+Go to your root directory and execute git clone `https://github.com/jaumebosch/vite-tools.git`. Then cd vite-tools and execute ./setup.sh
 
 ## About
-The script will download and install latest Vite Node stable release, also will modify some files for an optimal performance and add a couple of checks to your .bashrc to verify if the server has the Vite service running and if it is the latest stable release
+The script will download and install latest Vite Node stable release, also will modify some files for an optimal server performance. It also add a couple of checks to your .bashrc to verify if the server has the Vite service running and if it is the latest stable release.
+
+## Notice
+ledger_download.sh is still being developed, need some extra space for the ledger backup
