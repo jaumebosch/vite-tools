@@ -40,60 +40,63 @@ fi
 
 
 
+declare work_dir="../gvite"
+
 LATEST=$(curl --silent "https://api.github.com/repos/vitelabs/go-vite/releases/latest" |
     grep '"tag_name":' |
     sed -E 's/.*"([^"]+)".*/\1/')
-
 
 CURRENT=$(~/gvite/gvite -v | sed -n -e 's/^.*version //p')
 
 if [ "$CURRENT" != "$LATEST" ]; then
 
+    printf "${info}There is a new Vite Node stable release ($LATEST)${normal}\n"
+
     if pgrep -x "gvite" > /dev/null
-        then
-            printf "${success}Vite Node process running, stopping it...${normal}\n"
-            pkill -9 gvite
-        fi
-
-        declare work_dir="../gvite"
-
-        if [ -d "${work_dir}" ]; then
-          # Take action if $DIR exists. #
-          mv ${work_dir} ${work_dir}_bk
-        fi
-
-        printf "\n${info}Downloading latest Vite Node stable release ($LATEST) ${normal}\n"
-        curl -L -O "https://github.com/vitelabs/go-vite/releases/download/$LATEST/gvite-$LATEST-linux.tar.gz"
-        tar -xzvf "gvite-$LATEST-linux.tar.gz"
-        mv gvite-$LATEST-linux ${work_dir}
-        rm  "gvite-$LATEST-linux.tar.gz"
-
-
-        printf "\n${info}Vite FullNode name? ${normal}\n"
-        read fullNodeName
-
-        declare config_file="${work_dir}/node_config.json"
-
-        isInFile=$(cat ${config_file} | grep -c "foobar")
-        if [ $isInFile -eq 0 ]; then
-            printf "> ${error}Unable to set Vite Node name, already modified?${normal}\n\n"
-        else
-            sed -i 's/foobar/'"$fullNodeName"'/g' ${config_file}
-            printf "> Vite FullNode name set to ${info}$fullNodeName${normal}\n\n"
-        fi
-
-
-        printf "${info}Vite account? ${normal}\n"
-        read viteAccount
-
-        isInFile=$(cat ${config_file} | grep -c "vite_xxxxxxxxxxxxxxxxxx")
-        if [ $isInFile -eq 0 ]; then
-            printf "> ${error}Unable to ser Vite Account, already modified?${normal}\n\n"
-        else
-            sed -i 's/vite_xxxxxxxxxxxxxxxxxx/'"$viteAccount"'/g' ${config_file}
-            printf "> Vite Account set to ${info}$viteAccount${normal}\n\n"
-        fi
+    then
+        printf "${success}Vite Node process found, stopping it...${normal}\n"
+        pkill -9 gvite
     fi
+
+
+    if [ -d "${work_dir}" ]; then
+      printf "${info}Backing up old gvite directory${normal}\n"
+      mv ${work_dir} ${work_dir}_bk
+    fi
+
+    printf "\n${info}Downloading latest Vite Node stable release ($LATEST)${normal}\n"
+    curl -L -O "https://github.com/vitelabs/go-vite/releases/download/$LATEST/gvite-$LATEST-linux.tar.gz"
+    tar -xzvf "gvite-$LATEST-linux.tar.gz"
+    mv gvite-$LATEST-linux ${work_dir}
+    rm  "gvite-$LATEST-linux.tar.gz"
+
+
+    printf "\n${info}Vite FullNode name? ${normal}\n"
+    read fullNodeName
+
+    declare config_file="${work_dir}/node_config.json"
+
+    isInFile=$(cat ${config_file} | grep -c "foobar")
+    if [ $isInFile -eq 0 ]; then
+        printf "> ${error}Unable to set Vite Node name, already modified?${normal}\n\n"
+    else
+        sed -i 's/foobar/'"$fullNodeName"'/g' ${config_file}
+        printf "> Vite FullNode name set to ${info}$fullNodeName${normal}\n\n"
+    fi
+
+
+    printf "${info}Vite account? ${normal}\n"
+    read viteAccount
+
+    isInFile=$(cat ${config_file} | grep -c "vite_xxxxxxxxxxxxxxxxxx")
+    if [ $isInFile -eq 0 ]; then
+        printf "> ${error}Unable to ser Vite Account, already modified?${normal}\n\n"
+    else
+        sed -i 's/vite_xxxxxxxxxxxxxxxxxx/'"$viteAccount"'/g' ${config_file}
+        printf "> Vite Account set to ${info}$viteAccount${normal}\n\n"
+    fi
+else
+    printf "${success}Already running running the latest stable Vite Node release ($CURRENT)${normal}\n"
 fi
 
 
