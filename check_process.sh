@@ -13,5 +13,5 @@ then
     printf "${success}Vite Node process running${normal}\n"
 else
     printf "${error}Vite Node process not found. Launching${normal}\n"
-    ~/gvite/bootstrap.sh
+    ~/gvite/bootstrap
 fi
