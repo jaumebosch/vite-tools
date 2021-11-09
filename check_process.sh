@@ -12,5 +12,6 @@ if pgrep -x "gvite" > /dev/null
 then
     printf "${success}Vite Node process running${normal}\n"
 else
-    printf "${error}Vite Node process not found. Is it running?${normal}\n"
+    printf "${error}Vite Node process not found. Launching${normal}\n"
+    ~/gvite/bootstrap.sh
 fi
