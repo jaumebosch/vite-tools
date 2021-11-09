@@ -1,4 +1,6 @@
 #!/bin/bash
 
-grep -oP "Identity: '\\K.*(?=')" ../gvite/node_config.json
+jq  '.Identity' ../gvite/node_config.json
 git pull
+printf "\n\n"
+printf "================================================================\n"
