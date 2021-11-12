@@ -41,6 +41,7 @@ fi
 
 
 declare work_dir="../gvite"
+declare old_work_dir="../gvite_bk"
 
 LATEST=$(curl --silent "https://api.github.com/repos/vitelabs/go-vite/releases/latest" |
     grep '"tag_name":' |
@@ -51,53 +52,78 @@ CURRENT=$(~/gvite/gvite -v | sed -n -e 's/^.*version //p')
 if [ "$CURRENT" != "$LATEST" ]; then
 
     printf "${info}There is a new Vite Node stable release ($LATEST)${normal}\n"
+    printf "${info}Do you want to upgrade? [Y/n]${normal}\n"
+    read upgrade
 
-    if pgrep -x "gvite" > /dev/null
-    then
-        printf "${success}Vite Node process found, stopping it...${normal}\n"
-        pkill -9 gvite
-    fi
-
-
-    if [ -d "${work_dir}" ]; then
-      printf "${info}Backing up old gvite directory${normal}\n"
-      mv ${work_dir} ${work_dir}_bk
-    fi
-
-    printf "\n${info}Downloading latest Vite Node stable release ($LATEST)${normal}\n"
-    curl -L -O "https://github.com/vitelabs/go-vite/releases/download/$LATEST/gvite-$LATEST-linux.tar.gz"
-    tar -xzvf "gvite-$LATEST-linux.tar.gz"
-    mv gvite-$LATEST-linux ${work_dir}
-    rm  "gvite-$LATEST-linux.tar.gz"
+    if [upgrade == 'y' OR upgrade == 'Y' OR upgrade == '']; then
+        if pgrep -x "gvite" > /dev/null
+        then
+            printf "${success}Vite Node process found, stopping it...${normal}\n"
+            pkill -9 gvite
+        fi
 
 
-    printf "\n${info}Vite FullNode name? ${normal}\n"
-    read fullNodeName
+        if [ -d "${work_dir}" ]; then
+          if [ -d "${old_work_dir}" ]; then
+            rm -Rvf "${old_work_dir}"
+          fi
+          printf "${info}Backing up old gvite directory${normal}\n"
+          mv ${work_dir} ${old_work_dir}
+        fi
 
-    declare config_file="${work_dir}/node_config.json"
+        printf "\n${info}Downloading latest Vite Node stable release ($LATEST)${normal}\n"
+        curl -L -O "https://github.com/vitelabs/go-vite/releases/download/$LATEST/gvite-$LATEST-linux.tar.gz"
+        tar -xzvf "gvite-$LATEST-linux.tar.gz"
+        mv gvite-$LATEST-linux ${work_dir}
+        rm  "gvite-$LATEST-linux.tar.gz"
 
-    isInFile=$(cat ${config_file} | grep -c "foobar")
-    if [ $isInFile -eq 0 ]; then
-        printf "> ${error}Unable to set Vite Node name, already modified?${normal}\n\n"
+
+        #read old fullnodename
+
+        printf "\n${info}Vite FullNode name? ${normal}\n"
+        read fullNodeName
+
+        declare config_file="${work_dir}/node_config.json"
+
+        isInFile=$(cat ${config_file} | grep -c "foobar")
+        if [ $isInFile -eq 0 ]; then
+            printf "> ${error}Unable to set Vite Node name, already modified?${normal}\n\n"
+        else
+            sed -i 's/foobar/'"$fullNodeName"'/g' ${config_file}
+            printf "> Vite FullNode name set to ${info}$fullNodeName${normal}\n\n"
+        fi
+
+
+
+        #read old vite account
+
+        printf "${info}Vite account? ${normal}\n"
+        read viteAccount
+
+        isInFile=$(cat ${config_file} | grep -c "vite_xxxxxxxxxxxxxxxxxx")
+        if [ $isInFile -eq 0 ]; then
+            printf "> ${error}Unable to ser Vite Account, already modified?${normal}\n\n"
+        else
+            sed -i 's/vite_xxxxxxxxxxxxxxxxxx/'"$viteAccount"'/g' ${config_file}
+            printf "> Vite Account set to ${info}$viteAccount${normal}\n\n"
+        fi
+        
+        
+        
     else
-        sed -i 's/foobar/'"$fullNodeName"'/g' ${config_file}
-        printf "> Vite FullNode name set to ${info}$fullNodeName${normal}\n\n"
-    fi
+        printf "${info}Skipping... ${normal}\n"
 
-
-    printf "${info}Vite account? ${normal}\n"
-    read viteAccount
-
-    isInFile=$(cat ${config_file} | grep -c "vite_xxxxxxxxxxxxxxxxxx")
-    if [ $isInFile -eq 0 ]; then
-        printf "> ${error}Unable to ser Vite Account, already modified?${normal}\n\n"
-    else
-        sed -i 's/vite_xxxxxxxxxxxxxxxxxx/'"$viteAccount"'/g' ${config_file}
-        printf "> Vite Account set to ${info}$viteAccount${normal}\n\n"
-    fi
+    fi  
 else
     printf "${success}Already running running the latest stable Vite Node release ($CURRENT)${normal}\n"
 fi
+
+
+crontab -l > mycron
+echo "*/5 * * * * ~/vite-tools/check_process.sh" >> mycron
+printf "Installing crontab....\n"
+crontab mycron
+rm mycron
 
 
 declare vite_tools_dir="./vite-tools"
