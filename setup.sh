@@ -55,7 +55,8 @@ if [ "$CURRENT" != "$LATEST" ]; then
     printf "${info}Do you want to upgrade? [Y/n]${normal}\n"
     read upgrade
 
-    if [upgrade == 'y' OR upgrade == 'Y' OR upgrade == '']; then
+    if upgrade == 'y' OR upgrade == 'Y' OR upgrade == ''
+    then
         if pgrep -x "gvite" > /dev/null
         then
             printf "${success}Vite Node process found, stopping it...${normal}\n"
