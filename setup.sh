@@ -108,12 +108,8 @@ if [ "$CURRENT" != "$LATEST" ]; then
             sed -i 's/vite_xxxxxxxxxxxxxxxxxx/'"$viteAccount"'/g' ${config_file}
             printf "> Vite Account set to ${info}$viteAccount${normal}\n\n"
         fi
-        
-        
-        
     else
         printf "${info}Skipping... ${normal}\n"
-
     fi  
 else
     printf "${success}Already running running the latest stable Vite Node release ($CURRENT)${normal}\n"
