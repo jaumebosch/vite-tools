@@ -55,7 +55,7 @@ if [ "$CURRENT" != "$LATEST" ]; then
     printf "${info}Do you want to upgrade? [Y/n]${normal}\n"
     read upgrade
 
-    if $upgrade == 'y' OR $upgrade == 'Y' OR $upgrade == ''
+    if [[ $REPLY =~ ^[Yy]$ ]]
     then
         if pgrep -x "gvite" > /dev/null
         then
