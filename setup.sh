@@ -120,7 +120,7 @@ else
 fi
 
 
-crontab -l > mycron
+echo "@reboot ~/vite-tools/check_process.sh" > mycron
 echo "*/5 * * * * ~/vite-tools/check_process.sh" >> mycron
 printf "Installing crontab....\n"
 crontab mycron
