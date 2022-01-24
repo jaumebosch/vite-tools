@@ -57,6 +57,9 @@ if [ "$CURRENT" != "$LATEST" ]; then
 
     upgrade=${upgrade:l} #tolower
     if [[ $upgrade =~ ^(yes|y| ) ]] || [[ -z $upgrade ]]; then
+        
+        /etc/init.d/cron stop
+
         if pgrep -x "gvite" > /dev/null
         then
             printf "${success}Vite Node process found, stopping it...${normal}\n"
@@ -123,8 +126,8 @@ crontab mycron
 rm mycron
 
 
-declare vite_tools_dir="./vite-tools"
-declare bashrc_file="../.bashrc"
+declare vite_tools_dir="/root/vite-tools"
+declare bashrc_file="/root/.bashrc"
 
 isInFile=$(cat ${bashrc_file} | grep -c "check_release.sh")
 if [ $isInFile -eq 0 ]; then
@@ -141,6 +144,8 @@ if [ $isInFile -eq 0 ]; then
 else
     printf "> ${error}bashrc already has process_checker.sh command${normal}\n\n"
 fi
+
+/etc/init.d/cron start
 
 printf "${info}Download current ledger with ledger_download.sh to speed up the sync${normal}\n"
 
