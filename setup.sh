@@ -42,8 +42,8 @@ else
 fi
 
 
-declare work_dir="~/gvite"
-declare old_work_dir="~/gvite_bk"
+declare work_dir="../gvite"
+declare old_work_dir="../gvite_bk"
 declare gvite_executable=${work_dir}/gvite
 
 LATEST=$(curl --silent "https://api.github.com/repos/vitelabs/go-vite/releases/latest" |
