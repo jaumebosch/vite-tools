@@ -8,8 +8,7 @@ error=$(tput setaf 1)
 success=$(tput setaf 2)
 normal=$(tput sgr0)
 
-if pgrep -x "gvite" > /dev/null
-then
+if pgrep -x "gvite" > /dev/null; then
     printf "${success}Vite Node process running${normal}\n"
 else
     printf "${error}Vite Node process not found. Launching${normal}\n"

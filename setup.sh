@@ -15,8 +15,10 @@ normal=$(tput sgr0)
 
 
 declare limits_file="/etc/security/limits.conf"
+
 isInFile=$(cat ${limits_file} | grep -c "root soft nofile 10240
 root hard nofile 10240")
+
 if [ $isInFile -eq 0 ]; then
     printf "> ${success}modifing limits.conf...${normal}\n"
     sed -i '/^# End of file/i \
@@ -31,6 +33,7 @@ fi
 declare pam_limits_file="/etc/pam.d/common-session"
 
 isInFile=$(cat ${pam_limits_file} | grep -c "session required pam_limits.so")
+
 if [ $isInFile -eq 0 ]; then
     printf "> ${success}modifing pam_limits.so...${normal}\n\n"
     echo "session required pam_limits.so" >> ${pam_limits_file}
@@ -39,17 +42,22 @@ else
 fi
 
 
-
-declare work_dir="../gvite"
-declare old_work_dir="../gvite_bk"
+declare work_dir="~/gvite"
+declare old_work_dir="~/gvite_bk"
+declare gvite_executable=${work_dir}/gvite
 
 LATEST=$(curl --silent "https://api.github.com/repos/vitelabs/go-vite/releases/latest" |
     grep '"tag_name":' |
     sed -E 's/.*"([^"]+)".*/\1/')
 
-CURRENT=$(~/gvite/gvite -v | sed -n -e 's/^.*version //p')
+
+CURRENT=""
+if [ -f "$gvite_executable" ]; then
+    CURRENT=$($gvite_executable -v | sed -n -e 's/^.*version //p')
+fi
 
 if [ "$CURRENT" != "$LATEST" ]; then
+    #read old fullnodename
 
     printf "${info}There is a new Vite Node stable release ($LATEST)${normal}\n"
     printf "${info}Do you want to upgrade? [Y/n]${normal}\n"
@@ -60,12 +68,10 @@ if [ "$CURRENT" != "$LATEST" ]; then
         
         /etc/init.d/cron stop
 
-        if pgrep -x "gvite" > /dev/null
-        then
+        if pgrep -x "gvite" > /dev/null; then
             printf "${success}Vite Node process found, stopping it...${normal}\n"
-            pkill -9 gvite
+            pkill gvite
         fi
-
 
         if [ -d "${work_dir}" ]; then
           if [ -d "${old_work_dir}" ]; then
@@ -82,7 +88,6 @@ if [ "$CURRENT" != "$LATEST" ]; then
         rm  "gvite-$LATEST-linux.tar.gz"
 
 
-        #read old fullnodename
 
         printf "\n${info}Vite FullNode name? ${normal}\n"
         read fullNodeName
@@ -97,9 +102,6 @@ if [ "$CURRENT" != "$LATEST" ]; then
             printf "> Vite FullNode name set to ${info}$fullNodeName${normal}\n\n"
         fi
 
-
-
-        #read old vite account
 
         printf "${info}Vite account? ${normal}\n"
         read viteAccount
@@ -119,11 +121,11 @@ else
 fi
 
 
-echo "@reboot ~/vite-tools/check_process.sh" > mycron
-echo "*/5 * * * * ~/vite-tools/check_process.sh" >> mycron
+echo "@reboot ~/vite-tools/check_process.sh" > vite_cron
+echo "*/5 * * * * ~/vite-tools/check_process.sh" >> vite_cron
 printf "Installing crontab....\n"
-crontab mycron
-rm mycron
+crontab vite_cron
+rm vite_cron
 
 
 declare vite_tools_dir="/root/vite-tools"
@@ -147,8 +149,8 @@ fi
 
 /etc/init.d/cron start
 
-printf "${info}Download current ledger with ledger_download.sh to speed up the sync${normal}\n"
+#printf "${info}Download current ledger with ledger_download.sh to speed up the sync${normal}\n"
 
 printf "${info}Remember to logout and login to set the new limits${normal}\n"
-printf "${info}Launch ./bootstrap after relogin!\n${normal}"
+#printf "${info}Launch ./bootstrap after relogin!\n${normal}"
 printf "${success}Finished!${normal}\n\n"
