@@ -18,6 +18,7 @@ if [[ -f "${coltable}" ]]; then
 else
     # Set these values so the installer can still run in color
     COL_NC='\e[0m' # No Color
+    COL_LIGHT_BLUE='\e[1;34m'
     COL_LIGHT_GREEN='\e[1;32m'
     COL_LIGHT_RED='\e[1;31m'
     TICK="[${COL_LIGHT_GREEN}✓${COL_NC}]"
@@ -32,7 +33,7 @@ fi
 # A simple function that just echoes out VITE logo in ASCII format
 show_ascii_logo() {
     echo -e "
-        ${COL_LIGHT_GREEN}
+        ${COL_LIGHT_BLUE}
                                                                                 ,
                                                                     ,(@@@@@@@@. 
                                                          .(&@@@@@@@@@@@@@@@@*   
