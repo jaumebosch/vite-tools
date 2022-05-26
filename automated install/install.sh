@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # -e option instructs bash to immediately exit if any command [1] has a non-zero exit status
 # We do not want users to end up with a partially working install, so we exit the script
 # instead of continuing the installation with something broken
@@ -80,6 +79,14 @@ package_manager_detect() {
     fi
 }
 
+is_command() {
+    # Checks to see if the given command (passed as a string argument) exists on the system.
+    # The function returns 0 (success) if the command exists, and 1 if it doesn't.
+    local check_command="$1"
+
+    command -v "${check_command}" >/dev/null 2>&1
+}
+
  #A function that combines the previous git functions to update or clone a repo
 getGitFiles() {
     # Setup named variables for the git repos
@@ -120,6 +127,9 @@ clone_or_update_repos() {
 
 
 main() {
+    # Show the VITE logo
+    show_ascii_logo
+
     ######## FIRST CHECK ########
     # Must be root to install
     local str="Root user check"
@@ -129,8 +139,6 @@ main() {
     if [[ "${EUID}" -eq 0 ]]; then
         # they are root and all is good
         printf "  %b %s\\n" "${TICK}" "${str}"
-        # Show the VITE logo
-        show_ascii_logo
     else
         # Otherwise, they do not have enough privileges, so let the user know
         printf "  %b %s\\n" "${INFO}" "${str}"
