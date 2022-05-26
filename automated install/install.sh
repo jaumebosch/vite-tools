@@ -87,6 +87,32 @@ is_command() {
     command -v "${check_command}" >/dev/null 2>&1
 }
 
+# A function for checking if a directory is a git repository
+is_repo() {
+    # Use a named, local variable instead of the vague $1, which is the first argument passed to this function
+    # These local variables should always be lowercase
+    local directory="${1}"
+    # A variable to store the return code
+    local rc
+    # If the first argument passed to this function is a directory,
+    if [[ -d "${directory}" ]]; then
+        # move into the directory
+        pushd "${directory}" &> /dev/null || return 1
+        # Use git to check if the directory is a repo
+        # git -C is not used here to support git versions older than 1.8.4
+        git status --short &> /dev/null || rc=$?
+    # If the command was not successful,
+    else
+        # Set a non-zero return code if directory does not exist
+        rc=1
+    fi
+    # Move back into the directory the user started in
+    popd &> /dev/null || return 1
+    # Return the code; if one is not set, return 0
+    return "${rc:-0}"
+}
+
+
  #A function that combines the previous git functions to update or clone a repo
 getGitFiles() {
     # Setup named variables for the git repos
