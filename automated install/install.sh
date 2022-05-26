@@ -113,6 +113,43 @@ is_repo() {
     return "${rc:-0}"
 }
 
+# A function to clone a repo
+make_repo() {
+    # Set named variables for better readability
+    local directory="${1}"
+    local remoteRepo="${2}"
+
+    # The message to display when this function is running
+    str="Clone ${remoteRepo} into ${directory}"
+    # Display the message and use the color table to preface the message with an "info" indicator
+    printf "  %b %s..." "${INFO}" "${str}"
+    # If the directory exists,
+    if [[ -d "${directory}" ]]; then
+        # Return with a 1 to exit the installer. We don't want to overwrite what could already be here in case it is not ours
+        str="Unable to clone ${remoteRepo} into ${directory} : Directory already exists"
+        printf "%b  %b%s\\n" "${OVER}" "${CROSS}" "${str}"
+        return 1
+    fi
+    # Clone the repo and return the return code from this command
+    git clone -q --depth 20 "${remoteRepo}" "${directory}" &> /dev/null || return $?
+    # Move into the directory that was passed as an argument
+    pushd "${directory}" &> /dev/null || return 1
+    # Check current branch. If it is master, then reset to the latest available tag.
+    # In case extra commits have been added after tagging/release (i.e in case of metadata updates/README.MD tweaks)
+    curBranch=$(git rev-parse --abbrev-ref HEAD)
+    if [[ "${curBranch}" == "master" ]]; then
+        # If we're calling make_repo() then it should always be master, we may not need to check.
+        git reset --hard "$(git describe --abbrev=0 --tags)" || return $?
+    fi
+    # Show a colored message showing it's status
+    printf "%b  %b %s\\n" "${OVER}" "${TICK}" "${str}"
+    # Data in the repositories is public anyway so we can make it readable by everyone (+r to keep executable permission if already set by git)
+    chmod -R a+rX "${directory}"
+    # Move back into the original directory
+    popd &> /dev/null || return 1
+    return 0
+}
+
 
  #A function that combines the previous git functions to update or clone a repo
 getGitFiles() {
