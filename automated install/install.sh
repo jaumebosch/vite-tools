@@ -7,7 +7,7 @@ set -e
 
 viteToolsGitUrl="https://github.com/jaumebosch/vite-tools.git"
 
-VITE_TOOLS_LOCAL_REPO="/root"
+VITE_TOOLS_LOCAL_REPO="./vite-tools"
 
 
 # If the color table file exists,
@@ -113,6 +113,39 @@ is_repo() {
     return "${rc:-0}"
 }
 
+
+
+
+ #A function that combines the previous git functions to update or clone a repo
+getGitFiles() {
+    # Setup named variables for the git repos
+    # We need the directory
+    local directory="${1}"
+    # as well as the repo URL
+    local remoteRepo="${2}"
+    # A local variable containing the message to be displayed
+    local str="Check for existing repository in ${1}"
+    # Show the message
+    printf "  %b %s..." "${INFO}" "${str}"
+    # Check if the directory is a repository
+
+    if is_repo "${directory}"; then
+        # Show that we're checking it
+        printf "%b  %b %s\\n" "${OVER}" "${TICK}" "${str}"
+        # Update the repo, returning an error message on failure
+        update_repo "${directory}" || { printf "\\n  %b: Could not update local repository.%b\\n" "${COL_LIGHT_RED}" "${COL_NC}"; exit 1; }
+    # If it's not a .git repo,
+    else
+        # Show an error
+        printf "%b  %b %s\\n" "${OVER}" "${CROSS}" "${str}"
+        # Attempt to make the repository, showing an error on failure
+        make_repo "${directory}" "${remoteRepo}" || { printf "\\n  %bError: Could not update local repository.%b\\n" "${COL_LIGHT_RED}" "${COL_NC}"; exit 1; }
+    fi
+    echo ""
+    # Success via one of the two branches, as the commands would exit if they failed.
+    return 0
+}
+
 # A function to clone a repo
 make_repo() {
     # Set named variables for better readability
@@ -131,55 +164,67 @@ make_repo() {
         return 1
     fi
     # Clone the repo and return the return code from this command
-    git clone -q --depth 20 "${remoteRepo}" "${directory}" &> /dev/null || return $?
+    git clone "${remoteRepo}" "${directory}" &> /dev/null || return $?
     # Move into the directory that was passed as an argument
     pushd "${directory}" &> /dev/null || return 1
-    # Check current branch. If it is master, then reset to the latest available tag.
-    # In case extra commits have been added after tagging/release (i.e in case of metadata updates/README.MD tweaks)
-    curBranch=$(git rev-parse --abbrev-ref HEAD)
-    if [[ "${curBranch}" == "master" ]]; then
-        # If we're calling make_repo() then it should always be master, we may not need to check.
-        git reset --hard "$(git describe --abbrev=0 --tags)" || return $?
-    fi
     # Show a colored message showing it's status
     printf "%b  %b %s\\n" "${OVER}" "${TICK}" "${str}"
-    # Data in the repositories is public anyway so we can make it readable by everyone (+r to keep executable permission if already set by git)
-    chmod -R a+rX "${directory}"
-    # Move back into the original directory
+ 
     popd &> /dev/null || return 1
     return 0
 }
 
-
- #A function that combines the previous git functions to update or clone a repo
-getGitFiles() {
-    # Setup named variables for the git repos
-    # We need the directory
+# We need to make sure the repos are up-to-date so we can effectively install Clean out the directory if it exists for git to clone into
+update_repo() {
+    # Use named, local variables
+    # As you can see, these are the same variable names used in the last function,
+    # but since they are local, their scope does not go beyond this function
+    # This helps prevent the wrong value from being assigned if you were to set the variable as a GLOBAL one
     local directory="${1}"
-    # as well as the repo URL
-    local remoteRepo="${2}"
-    # A local variable containing the message to be displayed
-    local str="Check for existing repository in ${1}"
-    # Show the message
+
+    # A variable to store the message we want to display;
+    # Again, it's useful to store these in variables in case we need to reuse or change the message;
+    # we only need to make one change here
+    local str="Update repo in ${1}"
+    # Move into the directory that was passed as an argument
+    pushd "${directory}" &> /dev/null || return 1
+    # Let the user know what's happening
     printf "  %b %s..." "${INFO}" "${str}"
-    # Check if the directory is a repository
-    if is_repo "${directory}"; then
-        # Show that we're checking it
-        printf "%b  %b %s\\n" "${OVER}" "${TICK}" "${str}"
-        # Update the repo, returning an error message on failure
-        update_repo "${directory}" || { printf "\\n  %b: Could not update local repository.%b\\n" "${COL_LIGHT_RED}" "${COL_NC}"; exit 1; }
-    # If it's not a .git repo,
-    else
-        # Show an error
-        printf "%b  %b %s\\n" "${OVER}" "${CROSS}" "${str}"
-        # Attempt to make the repository, showing an error on failure
-        make_repo "${directory}" "${remoteRepo}" || { printf "\\n  %bError: Could not update local repository.%b\\n" "${COL_LIGHT_RED}" "${COL_NC}"; exit 1; }
-    fi
-    echo ""
-    # Success via one of the two branches, as the commands would exit if they failed.
+    # Stash any local commits as they conflict with our working code
+    # Pull the latest commits
+    git pull --no-rebase --quiet &> /dev/null || return $?
+
+    # Show a completion message
+    printf "%b  %b %s\\n" "${OVER}" "${TICK}" "${str}"
+    # Data in the repositories is public anyway so we can make it readable by everyone (+r to keep executable permission if already set by git)
+    popd &> /dev/null || return 1
     return 0
 }
 
+# We need to make sure the repos are up-to-date so we can effectively install Clean out the directory if it exists for git to clone into
+setup() {
+    # Use named, local variables
+    # As you can see, these are the same variable names used in the last function,
+    # but since they are local, their scope does not go beyond this function
+    # This helps prevent the wrong value from being assigned if you were to set the variable as a GLOBAL one
+    local directory="${1}"
+
+    # A variable to store the message we want to display;
+    # Again, it's useful to store these in variables in case we need to reuse or change the message;
+    # we only need to make one change here
+    local str="Launching setup"
+    # Let the user know what's happening
+    printf "  %b %s..." "${INFO}" "${str}"
+    echo ""
+    # Move into the directory that was passed as an argument
+    pushd "${directory}" &> /dev/null || return 1
+
+    ./setup.sh
+
+    popd &> /dev/null || return 1
+
+    return 0
+}
 
 clone_or_update_repos() {
     getGitFiles ${VITE_TOOLS_LOCAL_REPO} ${viteToolsGitUrl} || \
@@ -191,6 +236,7 @@ clone_or_update_repos() {
 
 
 main() {
+
     # Show the VITE logo
     show_ascii_logo
 
@@ -238,8 +284,12 @@ main() {
     # Check for supported package managers so that we may install dependencies
     package_manager_detect
 
-     # Download or update the scripts by updating the appropriate git repos
+    # Download or update the scripts by updating the appropriate git repos
     clone_or_update_repos
+
+    # Launch setup
+    setup ${VITE_TOOLS_LOCAL_REPO}
 }
 
 main
+
