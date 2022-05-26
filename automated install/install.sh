@@ -167,13 +167,13 @@ getGitFiles() {
         # Show that we're checking it
         printf "%b  %b %s\\n" "${OVER}" "${TICK}" "${str}"
         # Update the repo, returning an error message on failure
-        update_repo "${directory}" || { printf "\\n  %b: Could not update local repository. Contact support.%b\\n" "${COL_LIGHT_RED}" "${COL_NC}"; exit 1; }
+        update_repo "${directory}" || { printf "\\n  %b: Could not update local repository.%b\\n" "${COL_LIGHT_RED}" "${COL_NC}"; exit 1; }
     # If it's not a .git repo,
     else
         # Show an error
         printf "%b  %b %s\\n" "${OVER}" "${CROSS}" "${str}"
         # Attempt to make the repository, showing an error on failure
-        make_repo "${directory}" "${remoteRepo}" || { printf "\\n  %bError: Could not update local repository. Contact support.%b\\n" "${COL_LIGHT_RED}" "${COL_NC}"; exit 1; }
+        make_repo "${directory}" "${remoteRepo}" || { printf "\\n  %bError: Could not update local repository.%b\\n" "${COL_LIGHT_RED}" "${COL_NC}"; exit 1; }
     fi
     echo ""
     # Success via one of the two branches, as the commands would exit if they failed.
@@ -183,7 +183,7 @@ getGitFiles() {
 
 clone_or_update_repos() {
     getGitFiles ${VITE_TOOLS_LOCAL_REPO} ${viteToolsGitUrl} || \
-    { printf "  %bUnable to clone %s into %s, unable to continue%b\\n" "${COL_LIGHT_RED}" "${piholeGitUrl}" "${PI_HOLE_LOCAL_REPO}" "${COL_NC}"; \
+    { printf "  %b Unable to clone %s into %s, unable to continue%b\\n" "${COL_LIGHT_RED}" "${viteToolsGitUrl}" "${VITE_TOOLS_LOCAL_REPO}" "${COL_NC}"; \
     exit 1; \
     }
 }
@@ -219,7 +219,7 @@ main() {
             # when run via curl piping
             if [[ "$0" == "bash" ]]; then
                 # Download the install script and run it with admin rights
-                exec curl -sSL https://raw.githubusercontent.com/vite-tools/master/automated%20install/install.sh | sudo bash "$@"
+                exec curl -sSL https://raw.githubusercontent.com/jaumebosch/vite-tools/master/automated%20install/install.sh | sudo bash "$@"
             else
                 # when run via calling local bash script
                 exec sudo bash "$0" "$@"
