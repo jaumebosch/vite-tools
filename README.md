@@ -19,3 +19,6 @@ The script will download and install latest Vite Node stable release, also will 
 
 ## Notice
 ledger_download.sh is still being developed, need some extra space for the ledger backup
+
+## Tips & Donations
+vite_47a4e7f81d9979a7537235e648319954d69847f3745aeab87e
