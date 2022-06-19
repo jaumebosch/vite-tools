@@ -64,7 +64,7 @@ if [ "$CURRENT" != "$LATEST" ]; then
     read upgrade
 
     upgrade=${upgrade:l} #tolower
-    if [[ $upgrade =~ ^(yes|y| ) ]] || [[ -z $upgrade ]]; then
+    if [[ $upgrade =~ ^(yes|y|YES|Y ) ]] || [[ -z $upgrade ]]; then
         
         /etc/init.d/cron stop
 
@@ -114,7 +114,7 @@ if [ "$CURRENT" != "$LATEST" ]; then
             printf "> Vite Account set to ${info}$viteAccount${normal}\n\n"
         fi
     else
-        printf "${info}Skipping... ${normal}\n"
+        printf "${info}Not valid answer. Skipping... ${normal}\n"
     fi  
 else
     printf "${success}Already running running the latest stable Vite Node release ($CURRENT)${normal}\n"
