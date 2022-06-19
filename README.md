@@ -22,4 +22,5 @@ ledger_download.sh is still being developed, need some extra space for the ledge
 
 ## Tips & Donations
 vite_47a4e7f81d9979a7537235e648319954d69847f3745aeab87e
+
 ![Vite QR](qr_vite.png)
