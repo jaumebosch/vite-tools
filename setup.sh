@@ -147,6 +147,7 @@ else
     printf "> ${error}bashrc already has process_checker.sh command${normal}\n\n"
 fi
 
+pkill gvite
 /etc/init.d/cron start
 
 #printf "${info}Download current ledger with ledger_download.sh to speed up the sync${normal}\n"
